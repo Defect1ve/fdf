@@ -14,10 +14,10 @@
 #include <stdio.h>
 void	draw_line(t_dot first, t_dot second, t_fdf *fdf)
 {
-	fdf->draw->x1 = (int)(first.x + fdf->x_shift);
-	fdf->draw->y1 = (int)(first.y + fdf->y_shift);
-	fdf->draw->x2 = (int)(second.x + fdf->x_shift);
-	fdf->draw->y2 = (int)(second.y + fdf->y_shift);
+	fdf->draw->x1 = (int)(first.x * fdf->zoom + fdf->x_shift);
+	fdf->draw->y1 = (int)(first.y * fdf->zoom + fdf->y_shift);
+	fdf->draw->x2 = (int)(second.x * fdf->zoom + fdf->x_shift);
+	fdf->draw->y2 = (int)(second.y * fdf->zoom + fdf->y_shift);
 	fdf->draw->dx = ABS((fdf->draw->x2 - fdf->draw->x1));
 	fdf->draw->dy = ABS((fdf->draw->y2 - fdf->draw->y1));
 	fdf->draw->err = (fdf->draw->dx > fdf->draw->dy ?
@@ -113,9 +113,9 @@ void	save_map(t_fdf	*fdf)
 		j = -1;
 		while (mass && mass[++j] && j < fdf->col)
 		{
-			fdf->dots[i][j].x = j * fdf->zoom;
-			fdf->dots[i][j].y = i * fdf->zoom;
-			fdf->dots[i][j].z = ft_atoi(mass[j]) * fdf->zoom;
+			fdf->dots[i][j].x = j;
+			fdf->dots[i][j].y = i;
+			fdf->dots[i][j].z = ft_atoi(mass[j]);
 			fdf->dots[i][j].color = 0x820505;
 			if (ft_strchr(map->str, ','))
 				get_color(fdf->dots[i][j], ft_strchr(map->str, ','), "01234567890abcde");
@@ -291,8 +291,10 @@ static int	key_hook(int keycode, t_fdf *fdf)
 	(keycode == 2 && fdf->map) ? z_rotate(fdf, -0.03) : 0;
 	(keycode == 123 && fdf->dots) ? fdf->x_shift -= 11 : 0;
 	(keycode == 124 && fdf->map) ? fdf->x_shift += 11 : 0;
-	(keycode == 125 && fdf->map) ? fdf->y_shift += 11 : 0;
 	(keycode == 126 && fdf->map) ? fdf->y_shift -= 11 : 0;
+	(keycode == 125 && fdf->map) ? fdf->y_shift += 11 : 0;
+	(keycode == 27 && fdf->map) ? fdf->zoom /= 1.1 : 0;
+	(keycode == 24 && fdf->map) ? fdf->zoom *= 1.1 : 0;
 	(keycode == 49 && !fdf->map) ? start(fdf) : 0;
 	(fdf->map) ? redraw(fdf) : 0;
 	return (0);
@@ -337,7 +339,7 @@ int		main(int argc, char **argv)
 		error("Usage: ./fdf your_map");
 	fdf->fd = open(argv[1], O_RDONLY);
 	if (fdf->fd < 1)
-		error("Invalid file");
+		error("Directory or invalid file");
 	fdf->win_size = 1200;
 	fdf->map = NULL;
 	fdf->dots = NULL;

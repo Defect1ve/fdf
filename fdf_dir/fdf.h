@@ -60,7 +60,7 @@ typedef struct		s_fdf
 	t_draw			*draw;
 	int				win_size;
 	int				fd;
-	int				zoom;
+	double			zoom;
 }					t_fdf;
 
 #endif

@@ -1,0 +1,3 @@
+gcc -lmlx -framework OpenGL -framework AppKit -lm fdf.c ../libft/libft.a
+./a.out ../test_maps/mars.fdf
+rm a.out

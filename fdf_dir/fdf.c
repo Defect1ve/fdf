@@ -195,25 +195,38 @@ static int	key_hook(int keycode, t_fdf *fdf)
 
 void		first_scr(t_fdf *fdf)
 {
-	int len;
+	t_fdf	*fdf_s;
 
-	len = fdf->win_size / 2 - 300;
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len, 0xFF0000, "FFFFFFFFFFFFFFFFFFFFFFDDDDDDDDDDDDD      FFFFFFFFFFFFFFFFFFFFFF");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 15, 0xFF0000, "F::::::::::::::::::::FD::::::::::::DDD   F::::::::::::::::::::F");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 30, 0xFF0000, "F::::::::::::::::::::FD:::::::::::::::DD F::::::::::::::::::::F");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 45, 0xFF0000, "FF::::::FFFFFFFFF::::FDDD:::::DDDDD:::::DFF::::::FFFFFFFFF::::F");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 60, 0xFF0000, "  F:::::F       FFFFFF  D:::::D    D:::::D F:::::F       FFFFFF");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 75, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 90, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 105, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 120, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 135, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 150, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 165, 0xFF0000, "  F:::::F               D:::::D    D:::::D F:::::F             ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 180, 0xFF0000, "FF:::::::FF           DDD:::::DDDDD:::::DFF:::::::FF           ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 195, 0xFF0000, "F::::::::FF           D:::::::::::::::DD F::::::::FF           ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 205, 0xFF0000, "F::::::::FF           D::::::::::::DDD   F::::::::FF           ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 220, 0xFF0000, "FFFFFFFFFFF           DDDDDDDDDDDDD      FFFFFFFFFFF           ");
+	fdf_s = (t_fdf *)malloc(sizeof(t_fdf));
+	fdf_s->win_size = fdf->win_size;
+	fdf_s->map = NULL;
+	fdf_s->dots = NULL;
+	fdf_s->mlx_ptr = fdf->mlx_ptr;
+	fdf_s->win_ptr = fdf->win_ptr;
+	fdf_s->fd = open("first_screen.fdf", O_RDONLY);
+	start(fdf_s);
+	while (!fdf->map)
+	{
+		x_rotate(fdf_s, 0.1);
+		redraw(fdf_s);
+	}
+	// len = fdf->win_size / 2 - 300;
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len, 0xFF0000, "FFFFFFFFFFFFFFFFFFFFFFDDDDDDDDDDDDD      FFFFFFFFFFFFFFFFFFFFFF");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 15, 0xFF0000, "F::::::::::::::::::::FD::::::::::::DDD   F::::::::::::::::::::F");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 30, 0xFF0000, "F::::::::::::::::::::FD:::::::::::::::DD F::::::::::::::::::::F");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 45, 0xFF0000, "FF::::::FFFFFFFFF::::FDDD:::::DDDDD:::::DFF::::::FFFFFFFFF::::F");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 60, 0xFF0000, "  F:::::F       FFFFFF  D:::::D    D:::::D F:::::F       FFFFFF");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 75, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 90, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 105, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 120, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 135, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 150, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 165, 0xFF0000, "  F:::::F               D:::::D    D:::::D F:::::F             ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 180, 0xFF0000, "FF:::::::FF           DDD:::::DDDDD:::::DFF:::::::FF           ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 195, 0xFF0000, "F::::::::FF           D:::::::::::::::DD F::::::::FF           ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 205, 0xFF0000, "F::::::::FF           D::::::::::::DDD   F::::::::FF           ");
+	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 220, 0xFF0000, "FFFFFFFFFFF           DDDDDDDDDDDDD      FFFFFFFFFFF           ");
 	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, fdf->win_size / 2 - 75,
 	fdf->win_size * 0.9, 0xFF0000, "Just push SPACE");
 }
@@ -239,7 +252,7 @@ int			main(int argc, char **argv)
 	fdf->mlx_ptr = mlx_init();
 	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr,
 	fdf->win_size, fdf->win_size, "FCKN' FDF");
-	first_scr(fdf);
+	//first_scr(fdf);
 	mlx_hook(fdf->win_ptr, 2, 0, key_hook, fdf);
 	mlx_hook(fdf->win_ptr, 17, 1L << 17, exit_x, 0);
 	mlx_hook(fdf->win_ptr, 6, 1L << 13, mouse_move, fdf);

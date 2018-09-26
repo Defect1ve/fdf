@@ -77,6 +77,7 @@ typedef struct		s_fdf
 	t_mouse			mouse;
 	int				win_size;
 	int				fd;
+	int				start_fd;
 	double			zoom;
 }					t_fdf;
 

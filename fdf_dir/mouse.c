@@ -38,8 +38,8 @@ int			mouse_move(int x, int y, t_fdf *fdf)
 		fdf->mouse.pressed = 2;
 	else if (fdf->mouse.pressed == 2)
 	{
-		y_rotate(fdf, (double)(fdf->mouse.x - x) / 300);
-		x_rotate(fdf, (double)(fdf->mouse.y - y) / 300);
+		y_rotate(fdf, (double)(fdf->mouse.x - x) / 250);
+		x_rotate(fdf, (double)(fdf->mouse.y - y) / 250);
 		redraw(fdf);
 	}
 	fdf->mouse.x = x;

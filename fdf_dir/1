@@ -1,3 +1,3 @@
-gcc -lmlx -framework OpenGL -framework AppKit -lm fdf.c ../libft/libft.a
-./a.out ../test_maps/pyra.fdf
+gcc -lmlx -framework OpenGL -framework AppKit -lm fdf.c get_map.c map_modify.c mouse.c ../libft/libft.a
+./a.out ../fdf/maps/t2.fdf
 rm a.out

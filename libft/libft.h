@@ -18,7 +18,7 @@
 # include <stdlib.h>
 # include <locale.h>
 # include <stdarg.h>
-# define BUFF 1
+# define BUFF 1000
 # define BUFF_SIZE 100
 # define N_STR "(null)"
 # define SIZE(c) (c < 128) ? 1 : ((c < 2048) ?  2 : ((c < 65536) ? 3 : 4))

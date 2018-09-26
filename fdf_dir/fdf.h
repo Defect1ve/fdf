@@ -17,7 +17,7 @@
 # include "../libft/libft.h"
 # include <fcntl.h>
 # include <math.h>
-#define ABS(x) ((x) < 0) ? (-x) : (x)
+# define ABS(x) ((x) < 0) ? (-x) : (x)
 
 typedef struct		s_map
 {
@@ -45,6 +45,21 @@ typedef	struct		s_draw
 	int				e2;
 }					t_draw;
 
+typedef	struct		s_orig
+{
+	t_dot			**orig_dots;
+	int				orig_zoom;
+	int				orig_x_shift;
+	int				orig_y_shift;
+}					t_orig;
+
+typedef	struct		s_mouse
+{
+	char			pressed;
+	int				x;
+	int				y;
+}					t_mouse;
+
 typedef struct		s_fdf
 {
 	void			*mlx_ptr;
@@ -58,9 +73,22 @@ typedef struct		s_fdf
 	t_dot			**dots;
 	t_map			*map;
 	t_draw			*draw;
+	t_orig			*orig;
+	t_mouse			mouse;
 	int				win_size;
 	int				fd;
 	double			zoom;
 }					t_fdf;
+
+void				get_map(t_fdf *fdf);
+void				error(char *str);
+void				x_rotate(t_fdf *fdf, double rotate);
+void				y_rotate(t_fdf *fdf, double rotate);
+void				z_rotate(t_fdf *fdf, double rotate);
+void				change_color(t_fdf *fdf);
+int					mouse_press(int button, int x, int y, t_fdf *fdf);
+int					mouse_release(int button, int x, int y, t_fdf *fdf);
+int					mouse_move(int x, int y, t_fdf *fdf);
+void				redraw(t_fdf *fdf);
 
 #endif

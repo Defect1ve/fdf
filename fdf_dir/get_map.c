@@ -38,34 +38,13 @@ void		get_color(t_dot *dot, char *str)
 	ft_strdel(&base2);
 }
 
-static int	words(char const *s, char c)
-{
-	int i;
-	int t;
-	int check;
-
-	i = 0;
-	t = 0;
-	check = 0;
-	while (s && s[t] != '\0')
-	{
-		if (s[t] == c && check)
-			check = 0;
-		else if (s[t] != c && !check)
-		{
-			check = 1;
-			i++;
-		}
-		t++;
-	}
-	return (i);
-}
-
 void		save_orig_map(t_fdf *fdf)
 {
 	int i;
 	int j;
 
+	fdf->zoom = (fdf->col < fdf->rows) ? (fdf->win_size * 0.6)
+	/ fdf->rows : (fdf->win_size * 0.6) / fdf->col;
 	fdf->orig = (t_orig *)malloc(sizeof(t_orig));
 	i = -1;
 	fdf->orig->orig_dots = (t_dot **)malloc(sizeof(t_dot *) * fdf->rows);
@@ -86,44 +65,48 @@ void		save_orig_map(t_fdf *fdf)
 	fdf->orig->orig_y_shift = fdf->y_shift;
 }
 
+void		save_map_help(t_fdf *fdf, int i, t_map *map)
+{
+	int		k;
+	int		j;
+	char	**mass;
+
+	fdf->dots[i] = (t_dot *)malloc(sizeof(t_dot) * fdf->col);
+	mass = ft_strsplit(map->str, ' ');
+	j = -1;
+	while (mass && mass[++j] && j < fdf->col)
+	{
+		fdf->dots[i][j].x = j - fdf->col / 2;
+		fdf->dots[i][j].y = i - fdf->rows / 2;
+		fdf->dots[i][j].z = ft_atoi(mass[j]);
+		fdf->dots[i][j].color = 0xFFFFFF;
+		if (ft_strchr(mass[j], ','))
+			get_color(&(fdf->dots[i][j]), ft_strchr(mass[j], ',') + 1);
+	}
+	k = -1;
+	while (++k < fdf->col)
+		free(mass[k]);
+	free(mass);
+}
+
 void		save_map(t_fdf *fdf)
 {
 	int		i;
-	int		j;
-	int		k;
 	t_map	*map;
-	char	**mass;
 
 	map = fdf->map;
 	fdf->col = map ? words(map->str, ' ') : 0;
 	i = -1;
-	fdf->zoom = (fdf->col < fdf->rows) ? (fdf->win_size * 0.6)
-	/ fdf->rows : (fdf->win_size * 0.6) / fdf->col;
 	fdf->dots = (t_dot **)malloc(sizeof(t_dot *) * fdf->rows);
 	while (map && ++i < fdf->rows)
 	{
 		(fdf->col != 0 && fdf->col != words(map->str, ' ')) ?
 		error("Invalid num of cols") : 0;
-		fdf->dots[i] = (t_dot *)malloc(sizeof(t_dot) * fdf->col);
-		mass = ft_strsplit(map->str, ' ');
-		j = -1;
-		while (mass && mass[++j] && j < fdf->col)
-		{
-			fdf->dots[i][j].x = j - fdf->col / 2;
-			fdf->dots[i][j].y = i - fdf->rows / 2;
-			fdf->dots[i][j].z = ft_atoi(mass[j]);
-			fdf->dots[i][j].color = 0xFFFFFF;
-			if (ft_strchr(mass[j], ','))
-				get_color(&(fdf->dots[i][j]), ft_strchr(mass[j], ',') + 1);
-		}
+		save_map_help(fdf, i, map);
 		map = map->next;
-		k = -1;
-		while (++k < fdf->col)
-			free(mass[k]);
-		free(mass);
 	}
-	fdf->x_shift = (fdf->win_size) / 2;
-	fdf->y_shift = (fdf->win_size) / 2;
+	fdf->x_shift = fdf->win_size / 2;
+	fdf->y_shift = fdf->win_size / 2;
 	save_orig_map(fdf);
 }
 

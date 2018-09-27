@@ -77,7 +77,6 @@ typedef struct		s_fdf
 	t_mouse			mouse;
 	int				win_size;
 	int				fd;
-	int				start_fd;
 	double			zoom;
 }					t_fdf;
 
@@ -91,5 +90,12 @@ int					mouse_press(int button, int x, int y, t_fdf *fdf);
 int					mouse_release(int button, int x, int y, t_fdf *fdf);
 int					mouse_move(int x, int y, t_fdf *fdf);
 void				redraw(t_fdf *fdf);
+int					words(char const *s, char c);
+void				first_scr(t_fdf *fdf);
+void				get_image(t_fdf *fdf);
+int					exit_x(void);
+void				error(char *str);
+int					start(t_fdf *fdf);
+void				init_ptr(t_fdf *fdf);
 
 #endif

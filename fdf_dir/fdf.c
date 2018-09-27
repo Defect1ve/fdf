@@ -11,80 +11,6 @@
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include <stdio.h>
-int			get_light(int start, int end, double percentage)
-{
-	return ((int)((1 - percentage) * start + percentage * end));
-}
-
-double		percent(int start, int end, int current)
-{
-	double	placement;
-	double	distance;
-
-	placement = current - start;
-	distance = end - start;
-	return ((distance == 0) ? 1.0 : (placement / distance));
-}
-
-int			line_color(t_dot f, t_dot s, t_fdf *fdf)
-{
-	unsigned char	red;
-	unsigned char	green;
-	unsigned char	blue;
-	double			k;
-	double percentage;
-
-	if (fdf->draw->dx > fdf->draw->dy)
-		percentage = percent(f.x * fdf->zoom + fdf->x_shift,
-		fdf->draw->x2, fdf->draw->x1);
-	else
-		percentage = percent(f.y * fdf->zoom + fdf->y_shift,
-		fdf->draw->y2, fdf->draw->y1);
-	red = get_light((f.color >> 16) & 0xFF, (s.color >> 16) & 0xFF, percentage);
-	green = get_light((f.color >> 8) & 0xFF, (s.color >> 8) & 0xFF, percentage);
-	blue = get_light(f.color & 0xFF, s.color & 0xFF, percentage);
-	return ((red << 16) | (green << 8) | blue);
-}
-
-void		draw_line(t_dot first, t_dot second, t_fdf *fdf)
-{
-	fdf->draw->x1 = (int)(first.x * fdf->zoom + fdf->x_shift);
-	fdf->draw->y1 = (int)(first.y * fdf->zoom + fdf->y_shift);
-	fdf->draw->x2 = (int)(second.x * fdf->zoom + fdf->x_shift);
-	fdf->draw->y2 = (int)(second.y * fdf->zoom + fdf->y_shift);
-	fdf->draw->dx = ABS((fdf->draw->x2 - fdf->draw->x1));
-	fdf->draw->dy = ABS((fdf->draw->y2 - fdf->draw->y1));
-	fdf->draw->err = (fdf->draw->dx > fdf->draw->dy ?
-	fdf->draw->dx : -(fdf->draw->dy)) / 2;
-	if (fdf->draw->y2 < fdf->win_size && fdf->draw->x2 <
-	fdf->win_size && fdf->draw->x2 >= 0 && fdf->draw->y2 >= 0)
-		fdf->img[fdf->draw->y2 * fdf->win_size + fdf->draw->x2] = second.color;
-	while (fdf->draw->x1 != fdf->draw->x2 || fdf->draw->y1 != fdf->draw->y2)
-	{
-		if (fdf->draw->y1 < fdf->win_size && fdf->draw->x1 < fdf->win_size
-		&& fdf->draw->x1 >= 0 && fdf->draw->y1 >= 0)
-			fdf->img[fdf->draw->y1 * fdf->win_size +
-			fdf->draw->x1] = line_color(first, second, fdf);
-		fdf->draw->e2 = fdf->draw->err;
-		if (fdf->draw->e2 > -(fdf->draw->dx))
-		{
-			fdf->draw->err -= fdf->draw->dy;
-			fdf->draw->x1 += fdf->draw->x1 < fdf->draw->x2 ? 1 : -1;
-		}
-		if (fdf->draw->e2 < fdf->draw->dy)
-		{
-			fdf->draw->err += fdf->draw->dx;
-			fdf->draw->y1 += fdf->draw->y1 < fdf->draw->y2 ? 1 : -1;
-		}
-	}
-}
-
-void		error(char *str)
-{
-	ft_printf("%s\n", str);
-	exit(0);
-}
 
 void		init_ptr(t_fdf *fdf)
 {
@@ -98,25 +24,6 @@ void		init_ptr(t_fdf *fdf)
 	fdf->img_ptr = mlx_new_image(fdf->mlx_ptr, fdf->win_size, fdf->win_size);
 	fdf->img = (int *)mlx_get_data_addr(fdf->img_ptr,
 	&bits_per_pixel, &size_line, &endian);
-}
-
-void		get_image(t_fdf *fdf)
-{
-	int i;
-	int j;
-
-	i = -1;
-	while (++i < fdf->rows)
-	{
-		j = -1;
-		while (++j < fdf->col)
-		{
-			if (i + 1 < fdf->rows)
-				draw_line(fdf->dots[i][j], fdf->dots[i + 1][j], fdf);
-			if (j + 1 < fdf->col)
-				draw_line(fdf->dots[i][j], fdf->dots[i][j + 1], fdf);
-		}
-	}
 }
 
 void		redraw(t_fdf *fdf)
@@ -134,14 +41,11 @@ void		redraw(t_fdf *fdf)
 	mlx_clear_window(fdf->mlx_ptr, fdf->win_ptr);
 	get_image(fdf);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->img_ptr, 0, 0);
-}
-
-int			start(t_fdf *fdf)
-{
-	fdf->draw = (t_draw *)malloc(sizeof(t_draw));
-	get_map(fdf);
-	init_ptr(fdf);
-	return (1);
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 0, 0xFFFFFF, "ROTATE: Q/A, W/S, E/D (mouse)");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 20, 0xFFFFFF, "ZOOM: +/- (mouse)");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 40, 0xFFFFFF, "RESPAWN: R");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 60, 0xFFFFFF, "CHANGE COLOR: C");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 80, 0xFFFFFF, "MOVE: keyboard arrows");
 }
 
 void		make_map_orig(t_fdf *fdf)
@@ -171,7 +75,6 @@ static int	key_hook(int keycode, t_fdf *fdf)
 	if (keycode == 53)
 	{
 		mlx_destroy_window(fdf->mlx_ptr, fdf->win_ptr);
-		system("leaks -q a.out");
 		exit(0);
 	}
 	(keycode == 15 && fdf->map) ? make_map_orig(fdf) : 0;
@@ -193,49 +96,6 @@ static int	key_hook(int keycode, t_fdf *fdf)
 	return (0);
 }
 
-void		first_scr(t_fdf *fdf)
-{
-	t_fdf	*fdf_s;
-
-	fdf_s = (t_fdf *)malloc(sizeof(t_fdf));
-	fdf_s->win_size = fdf->win_size;
-	fdf_s->map = NULL;
-	fdf_s->dots = NULL;
-	fdf_s->mlx_ptr = fdf->mlx_ptr;
-	fdf_s->win_ptr = fdf->win_ptr;
-	fdf_s->fd = open("first_screen.fdf", O_RDONLY);
-	start(fdf_s);
-	while (!fdf->map)
-	{
-		x_rotate(fdf_s, 0.1);
-		redraw(fdf_s);
-	}
-	// len = fdf->win_size / 2 - 300;
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len, 0xFF0000, "FFFFFFFFFFFFFFFFFFFFFFDDDDDDDDDDDDD      FFFFFFFFFFFFFFFFFFFFFF");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 15, 0xFF0000, "F::::::::::::::::::::FD::::::::::::DDD   F::::::::::::::::::::F");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 30, 0xFF0000, "F::::::::::::::::::::FD:::::::::::::::DD F::::::::::::::::::::F");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 45, 0xFF0000, "FF::::::FFFFFFFFF::::FDDD:::::DDDDD:::::DFF::::::FFFFFFFFF::::F");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 60, 0xFF0000, "  F:::::F       FFFFFF  D:::::D    D:::::D F:::::F       FFFFFF");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 75, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 90, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 105, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 120, 0xFF0000, "  F:::::::::::::::F     D:::::D     D:::::DF:::::::::::::::F   ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 135, 0xFF0000, "  F::::::FFFFFFFFFF     D:::::D     D:::::DF::::::FFFFFFFFFF   ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 150, 0xFF0000, "  F:::::F               D:::::D     D:::::DF:::::F             ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 165, 0xFF0000, "  F:::::F               D:::::D    D:::::D F:::::F             ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 180, 0xFF0000, "FF:::::::FF           DDD:::::DDDDD:::::DFF:::::::FF           ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 195, 0xFF0000, "F::::::::FF           D:::::::::::::::DD F::::::::FF           ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 205, 0xFF0000, "F::::::::FF           D::::::::::::DDD   F::::::::FF           ");
-	// mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 220, 0xFF0000, "FFFFFFFFFFF           DDDDDDDDDDDDD      FFFFFFFFFFF           ");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, fdf->win_size / 2 - 75,
-	fdf->win_size * 0.9, 0xFF0000, "Just push SPACE");
-}
-
-static int	exit_x(void)
-{
-	exit(0);
-}
-
 int			main(int argc, char **argv)
 {
 	t_fdf	*fdf;
@@ -246,13 +106,13 @@ int			main(int argc, char **argv)
 	fdf->fd = open(argv[1], O_RDONLY);
 	if (fdf->fd < 1)
 		error("Directory or invalid file");
-	fdf->win_size = 1200;
+	fdf->win_size = 1300;
 	fdf->map = NULL;
 	fdf->dots = NULL;
 	fdf->mlx_ptr = mlx_init();
 	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr,
 	fdf->win_size, fdf->win_size, "FCKN' FDF");
-	//first_scr(fdf);
+	first_scr(fdf);
 	mlx_hook(fdf->win_ptr, 2, 0, key_hook, fdf);
 	mlx_hook(fdf->win_ptr, 17, 1L << 17, exit_x, 0);
 	mlx_hook(fdf->win_ptr, 6, 1L << 13, mouse_move, fdf);

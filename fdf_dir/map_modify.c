@@ -77,8 +77,8 @@ void		z_rotate(t_fdf *fdf, double rotate)
 
 void		change_color(t_fdf *fdf)
 {
-	int  i;
-	int  j;
+	int		i;
+	int		j;
 
 	i = -1;
 	while (++i < fdf->rows)
@@ -87,4 +87,27 @@ void		change_color(t_fdf *fdf)
 		while (++j < fdf->col)
 			fdf->dots[i][j].color += 0x010110;
 	}
+}
+
+int			words(char const *s, char c)
+{
+	int i;
+	int t;
+	int check;
+
+	i = 0;
+	t = 0;
+	check = 0;
+	while (s && s[t] != '\0')
+	{
+		if (s[t] == c && check)
+			check = 0;
+		else if (s[t] != c && !check)
+		{
+			check = 1;
+			i++;
+		}
+		t++;
+	}
+	return (i);
 }

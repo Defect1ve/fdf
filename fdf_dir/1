@@ -1,3 +1,0 @@
-gcc -lmlx -framework OpenGL -framework AppKit -lm fdf.c get_map.c map_modify.c mouse.c ../libft/libft.a
-./a.out first_screen.fdf
-

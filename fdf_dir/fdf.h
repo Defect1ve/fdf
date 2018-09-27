@@ -97,5 +97,6 @@ int					exit_x(void);
 void				error(char *str);
 int					start(t_fdf *fdf);
 void				init_ptr(t_fdf *fdf);
+void				line_check(t_map *map, char *line);
 
 #endif

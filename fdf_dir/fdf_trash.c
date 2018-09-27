@@ -48,7 +48,7 @@ void		first_scr2(t_fdf *fdf, int len)
 	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, len, len + 220, 0xFF0000,
 	"FFFFFFFFFFF           DDDDDDDDDDDDD      FFFFFFFFFFF           ");
 	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, fdf->win_size / 2 - 75,
-	fdf->win_size * 0.9, 0xFF0000, "Just push SPACE");
+	fdf->win_size * 0.9, 0xFF0000, "Just push ANY key");
 }
 
 void		first_scr(t_fdf *fdf)

@@ -24,7 +24,8 @@ void		get_color(t_dot *dot, char *str)
 	len = -1;
 	base1 = ft_strdup("0123456789ABCDEF");
 	base2 = ft_strdup("0123456789abcdef");
-	(str[0] != '0' || str[1] != 'x') ? error("Invalid color") : 0;
+	(str[0] != '0' || (str[1] != 'x' && str[1] != 'X') || ft_strlen(str) > 8)
+	? error("Invalid color") : 0;
 	str += 2;
 	while (str[++len])
 	{
@@ -43,6 +44,8 @@ void		save_orig_map(t_fdf *fdf)
 	int i;
 	int j;
 
+	fdf->x_shift = fdf->win_size / 2;
+	fdf->y_shift = fdf->win_size / 2;
 	fdf->zoom = (fdf->col < fdf->rows) ? (fdf->win_size * 0.6)
 	/ fdf->rows : (fdf->win_size * 0.6) / fdf->col;
 	fdf->orig = (t_orig *)malloc(sizeof(t_orig));
@@ -96,6 +99,7 @@ void		save_map(t_fdf *fdf)
 
 	map = fdf->map;
 	fdf->col = map ? words(map->str, ' ') : 0;
+	(fdf->rows == 0 && fdf->col == 0) ? error("Empty file") : 0;
 	i = -1;
 	fdf->dots = (t_dot **)malloc(sizeof(t_dot *) * fdf->rows);
 	while (map && ++i < fdf->rows)
@@ -105,8 +109,6 @@ void		save_map(t_fdf *fdf)
 		save_map_help(fdf, i, map);
 		map = map->next;
 	}
-	fdf->x_shift = fdf->win_size / 2;
-	fdf->y_shift = fdf->win_size / 2;
 	save_orig_map(fdf);
 }
 
@@ -116,7 +118,7 @@ void		get_map(t_fdf *fdf)
 	char	*line;
 
 	fdf->rows = 0;
-	while (get_next_line(fdf->fd, &line))
+	while (get_next_line(fdf->fd, &line) > 0)
 	{
 		if (!fdf->map)
 		{
@@ -132,7 +134,7 @@ void		get_map(t_fdf *fdf)
 			map = map->next;
 		}
 		map->next = NULL;
-		map->str = line;
+		line_check(map, line);
 		line = NULL;
 		fdf->rows++;
 	}

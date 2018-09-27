@@ -14,7 +14,8 @@
 
 double		rat(int start, int end, int current)
 {
-	return ((end == start) ? 1.0 : ((current - start) / (end - start)));
+	return ((end == start) ? 1.0 :
+	((double)(current - start) / (double)(end - start)));
 }
 
 int			line_color(t_dot f, t_dot s, t_fdf *fdf)
@@ -30,11 +31,11 @@ int			line_color(t_dot f, t_dot s, t_fdf *fdf)
 	else
 		ratio = rat(f.y * fdf->zoom + fdf->y_shift,
 		fdf->draw->y2, fdf->draw->y1);
-	red = (1 - ratio) * ((f.color >> 16) & 0xFF)
-	+ ratio * ((s.color >> 16) & 0xFF);
-	green = (1 - ratio) * ((f.color >> 8) & 0xFF)
-	+ ratio * ((s.color >> 8) & 0xFF);
-	blue = (1 - ratio) * (f.color & 0xFF) + ratio * (s.color & 0xFF);
+	red = (double)((1 - ratio) * ((f.color >> 16) & 0xFF)
+	+ ratio * ((s.color >> 16) & 0xFF));
+	green = (double)((1 - ratio) * ((f.color >> 8) & 0xFF)
+	+ ratio * ((s.color >> 8) & 0xFF));
+	blue = (double)((1 - ratio) * (f.color & 0xFF) + ratio * (s.color & 0xFF));
 	return ((red << 16) | (green << 8) | blue);
 }
 
@@ -93,4 +94,6 @@ void		get_image(t_fdf *fdf)
 				draw_line(fdf->dots[i][j], fdf->dots[i][j + 1], fdf);
 		}
 	}
+	if (fdf->col == 1 && fdf->rows == 1)
+		draw_line(fdf->dots[0][0], fdf->dots[0][0], fdf);
 }

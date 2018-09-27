@@ -16,9 +16,9 @@ int			mouse_press(int button, int x, int y, t_fdf *fdf)
 {
 	if (!fdf->map)
 		return (0);
-	if (button == 5)
+	if (button == 5 && fdf->zoom > 1)
 		fdf->zoom /= 1.1;
-	else if (button == 4)
+	else if (button == 4 && fdf->zoom < 100)
 		fdf->zoom *= 1.1;
 	else if (button == 1)
 		fdf->mouse.pressed = 1;
@@ -54,3 +54,15 @@ int			mouse_move(int x, int y, t_fdf *fdf)
 	return (0);
 }
 
+void		line_check(t_map *map, char *line)
+{
+	int k;
+
+	k = -1;
+	while (line[++k])
+		if (!ft_isdigit(line[k]) && line[k] != ' ' && line[k] != ',' && line[k]
+		!= 'x' && line[k] != 'X' && ((line[k] < 'A' || line[k] > 'F')
+		&& (line[k] < 'a' || line[k] > 'f')))
+			error("Invalid map");
+	map->str = line;
+}

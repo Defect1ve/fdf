@@ -41,11 +41,16 @@ void		redraw(t_fdf *fdf)
 	mlx_clear_window(fdf->mlx_ptr, fdf->win_ptr);
 	get_image(fdf);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->img_ptr, 0, 0);
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 0, 0xFFFFFF, "ROTATE: Q/A, W/S, E/D (mouse)");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 20, 0xFFFFFF, "ZOOM: +/- (mouse)");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 40, 0xFFFFFF, "RESPAWN: R");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 60, 0xFFFFFF, "CHANGE COLOR: C");
-	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0, 80, 0xFFFFFF, "MOVE: keyboard arrows");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0,
+	0, 0x204c39, "ROTATE: Q/A, W/S, E/D (mouse)");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0,
+	20, 0x204c39, "ZOOM: +/- (mouse)");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0,
+	40, 0x204c39, "RESPAWN: R");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0,
+	60, 0x204c39, "CHANGE COLOR: C");
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, 0,
+	80, 0x204c39, "MOVE: keyboard arrows");
 }
 
 void		make_map_orig(t_fdf *fdf)
@@ -89,9 +94,8 @@ static int	key_hook(int keycode, t_fdf *fdf)
 	(keycode == 124 && fdf->map) ? fdf->x_shift += 11 : 0;
 	(keycode == 126 && fdf->map) ? fdf->y_shift -= 11 : 0;
 	(keycode == 125 && fdf->map) ? fdf->y_shift += 11 : 0;
-	(keycode == 27 && fdf->map) ? fdf->zoom /= 1.1 : 0;
-	(keycode == 24 && fdf->map) ? fdf->zoom *= 1.1 : 0;
-	(keycode == 49 && !fdf->map) ? start(fdf) : 0;
+	(keycode == 27 && fdf->map && fdf->zoom > 1) ? fdf->zoom /= 1.1 : 0;
+	(keycode == 24 && fdf->map && fdf->zoom < 100) ? fdf->zoom *= 1.1 : 0;
 	(fdf->map) ? redraw(fdf) : 0;
 	return (0);
 }
@@ -112,6 +116,7 @@ int			main(int argc, char **argv)
 	fdf->mlx_ptr = mlx_init();
 	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr,
 	fdf->win_size, fdf->win_size, "FCKN' FDF");
+	start(fdf);
 	first_scr(fdf);
 	mlx_hook(fdf->win_ptr, 2, 0, key_hook, fdf);
 	mlx_hook(fdf->win_ptr, 17, 1L << 17, exit_x, 0);
